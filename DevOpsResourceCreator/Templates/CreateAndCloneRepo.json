@@ -1,0 +1,21 @@
+{
+  "authorization": {
+    "parameters": {
+      "password": "#PAT#",
+      "username": "."
+    },
+    "scheme": "UsernamePassword"
+  },
+  "serviceEndpointProjectReferences": [
+    {
+      "projectReference": {
+        "id": "#ProjectId#",
+        "name": "#ProjectName#"
+      },
+      "name": "#ServiceEndPointName#"
+    }
+  ],
+  "name": "#ServiceEndPointName#",
+  "type": "git",
+  "url": "#SourceUrl#"
+}

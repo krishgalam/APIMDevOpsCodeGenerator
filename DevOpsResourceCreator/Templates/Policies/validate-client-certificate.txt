@@ -1,0 +1,12 @@
+﻿<validate-client-certificate
+    validate-revocation='true'
+    validate-trust='true'
+    validate-not-before='true'
+    validate-not-after='true'
+    ignore-error='false'>
+  <identities>
+    <identity
+        subject='C=US, ST=Illinois, L=Chicago, O=Contoso Corp., CN=*.contoso.com'
+        issuer-subject='C=BE, O=FabrikamSign nv-sa, OU=Root CA, CN=FabrikamSign Root CA' />
+  </identities>
+</validate-client-certificate>

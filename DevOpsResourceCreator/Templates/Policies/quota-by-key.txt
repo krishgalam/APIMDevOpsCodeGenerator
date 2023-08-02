@@ -1,0 +1,5 @@
+﻿<!-- Quota by key policy: The quota-by-key policy enforces a renewable or lifetime call volume and/or bandwidth quota, on a per key basis-->
+<quota-by-key calls='@(context.Variables['quotaCalls'])' bandwidth='@(context.Variables['quotaBandwidth'])' 
+              renewal-period='@(context.Variables['quotaRenewalPeriod'])
+              increment-condition='@(context.Response.StatusCode >= 200 && context.Response.StatusCode < 400)'
+                  counter-key='@(context.Request.IpAddress)' />

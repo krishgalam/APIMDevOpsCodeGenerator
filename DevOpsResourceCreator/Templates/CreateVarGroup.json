@@ -1,0 +1,38 @@
+{
+	"name": "This is ignored",
+	"description": "This is ignored",
+	"type": "Vsts",
+	"variables": {
+		"BuildConfiguration": {
+			"value": "Release"
+		},
+		"rgname": {
+			"value": "rg-fsapps-apimaas-dev-eus"
+		},
+		"saKey": {
+			"value": "MKGDS3IuJdw+fwViebpjqfterxvcS30r1AKt7QDJfr5gqDVDjlKZNJm0i4cs5qIqxJMPiBtaj26lffRNX+dqig=="
+		},
+		"ServiceConnectionName": {
+			"value": "apimaas-dev-sc"
+		},
+		"storageaccountname": {
+			"value": "strgapimaastfstates"
+		},
+		"terraformstatecontainer": {
+			"value": "terraform-dev"
+		},
+		"location": {
+			"value": "East US"
+		}
+	},
+	"variableGroupProjectReferences": [
+		{
+			"name": "VarGroup",
+			"description": "The variable group to store the information about the variables using in the Pipeline",
+			"projectReference": {
+				"id": "#ProjectId#",
+				"name": "#ProjectName#"
+			}
+		}
+	]
+}

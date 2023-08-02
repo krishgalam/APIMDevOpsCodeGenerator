@@ -1,0 +1,1 @@
+﻿<cache-store duration='3600' />

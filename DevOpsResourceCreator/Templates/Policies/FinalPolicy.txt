@@ -1,0 +1,32 @@
+﻿<policies>
+    <inbound>
+        <set-backend-service base-url='https://#{wapp-name}#.azurewebsites.net/' />
+        <base />
+        <set-variable name='clientConnectionID' value='10' />
+        <set-variable name='execute-branch-one' value='true' />
+        <set-variable name='value-one' value='1' />
+        <set-variable name='execute-branch-two' value='true' />
+        <set-variable name='value-two' value='1' />
+        <set-variable name='enduserid' value='2' />
+        #rate-limit#
+        #ip-filter#
+        #trace#
+        #cache-lookup#    
+        #cache-lookup-value#
+        #cache-store-value#
+        #cache-remove-value#
+        #cross-domain#
+        #cors#
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+        #cache-store#        
+        #xml-to-json#
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

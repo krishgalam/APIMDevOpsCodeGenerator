@@ -1,0 +1,1 @@
+﻿<authentication-managed-identity resource='https://graph.microsoft.com'/>

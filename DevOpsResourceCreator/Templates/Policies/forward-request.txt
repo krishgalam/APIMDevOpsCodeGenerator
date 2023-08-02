@@ -1,0 +1,4 @@
+﻿<backend>
+  <forward-request timeout='120' fail-on-error-status-code='true' />
+  <!-- effective policy. note the absence of <base/> -->
+</backend>

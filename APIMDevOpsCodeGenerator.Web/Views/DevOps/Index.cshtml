@@ -1,0 +1,173 @@
+﻿@model APIMDevOpsCodeGenerator.Web.Models.DevOpsModel
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+@if ((string)TempData["Response"] == "Success")
+{
+    <div class="alert alert-success">
+        <strong>@TempData["ResponseMessage"]</strong>
+    </div>
+}
+else if ((string)TempData["Response"] == "Error")
+{
+    <div class="alert alert-danger">
+        <strong>@TempData["ResponseMessage"]</strong>
+    </div>
+}
+<form asp-action="Create">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="card border-dark md-3 one_card">
+                <div class="card-body">
+                    <div class="badge fm-outline">Azure DevOps</div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group mx-sm-4 mb-2">
+                        <label asp-for="OrganizationName" class="control-label badge"></label> 
+                        <img src="~/lib/images/informationicon.png"
+                            title="List of Organizations you hava access to" />
+                        <select asp-for="OrganizationName" asp-items="Model.Organizations"
+                            class="form-control form-control-sm cg-font"></select>
+                        <span asp-validation-for="OrganizationName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mx-sm-4 mb-2">
+                        <label asp-for="ProjectName" class="control-label badge"></label> 
+
+                        <img src="~/lib/images/informationicon.png"
+                            title="List of Projects in your Organization" />
+                        <select asp-for="ProjectName" class="form-control form-control-sm cg-font"
+                            asp-items="@(new SelectList(string.Empty, "Value", "Text"))"></select>
+                        <span asp-validation-for="ProjectName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mx-sm-4 mb-2">
+                        <label asp-for="ServiceConnection" class="control-label badge"></label> 
+                        <img src="~/lib/images/informationicon.png"
+                            title="Existing ServiceConnection created for your DevOps project" />
+                        <select asp-for="ServiceConnection" class="form-control form-control-sm cg-font"
+                            asp-items="@(new SelectList(string.Empty, "Value", "Text"))"></select>
+                        <span asp-validation-for="ServiceConnection" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card border-dark md-3 two_card">
+                <div class="card-body">
+                    <div class="badge fm-outlined">Deploy To Environment</div>
+                    <div class="form-check form-check-inline">
+                        <div class="form-group cg-font">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="form-check-input fonts" asp-for="DeploytoDev"
+                                id="flexCheckCheckedDisabled" title="Check if Dev pipeline should be created" checked
+                                onclick="return false" />
+                            @Html.DisplayNameFor(m => m.DeploytoDev)
+                        </div>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <div class="form-group cg-font">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="form-check-input fonts" asp-for="DeploytoUAT"
+                                title="Check if UAT pipeline should be created" /> @Html.DisplayNameFor(m =>
+                            m.DeploytoUAT)
+                        </div>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <div class="form-group cg-font">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="form-check-input fonts"
+                                asp-for="DeploytoProduction" title="Check if Prod pipeline should be created" />
+                            @Html.DisplayNameFor(m => m.DeploytoProduction)
+                        </div>
+                    </div>
+                     <div class="card border-dark">
+                        <div class="fm-outlined badge">Artifacts</div>
+                        <div class="card-body">
+                            <dt class="control-label badge">Repositories</dt>
+                            <dd class="ml-3 cg-font"><input class="form-check-input" type="checkbox" id="flexCheckCheckedDisabled" checked
+                                    disabled>New Apim-as-a-Service Repository</dd>
+                            <dd class="ml-3 cg-font"><input class="form-check-input" type="checkbox" id="flexCheckCheckedDisabled" checked
+                                    disabled>Api 1 Repository</dd>
+                            <dt class="control-label badge">Pipelines</dt>
+                            <dd class="ml-3 cg-font"><input class="form-check-input" type="checkbox" id="flexCheckCheckedDisabled" checked
+                                    disabled>Container Apps Infra Provisioning</dd>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+    &nbsp;
+    <div class="col-md-12">
+        <div class="form-group">
+            <input type="submit" id="Create" value="Generate Container App Artifacts" class="btn btn-success" />
+        </div>
+    </div>
+
+</form>
+
+
+@section Scripts {
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<script>
+    function LoadProject() {
+        $.getJSON("/DevOps/Projects", { id: $("#OrganizationName").val() }, function (d) {
+            var row = "";
+            $("#ProjectName").empty();
+            $.each(d, function (i, v) {
+                row += "<option value=" + v.value + ">" + v.text + "</option>";
+            });
+            $("#ProjectName").html(row);
+            $.getJSON("/DevOps/ServiceEndPoints", { organization: $("#OrganizationName").val(), project: $("#ProjectName option:selected").text() }, function (d) {
+                var row = "";
+                $("#ServiceConnection").empty();
+                $.each(d, function (i, v) {
+                    row += "<option value=" + v.value + ">" + v.text + "</option>";
+                });
+                $("#ServiceConnection").html(row);
+            })
+        })
+
+    }
+
+    $(function () {
+        LoadProject();
+        $("#OrganizationName").change(function () {
+            $.getJSON("/DevOps/Projects", { id: $("#OrganizationName").val() }, function (d) {
+                var row = "";
+                $("#ProjectName").empty();
+                $.each(d, function (i, v) {
+                    row += "<option value=" + v.value + ">" + v.text + "</option>";
+                });
+                $("#ProjectName").html(row);
+                $.getJSON("/DevOps/ServiceEndPoints", { organization: $("#OrganizationName").val(), project: $("#ProjectName option:selected").text() }, function (d) {
+                    var row = "";
+                    $("#ServiceConnection").empty();
+                    $.each(d, function (i, v) {
+                        row += "<option value=" + v.value + ">" + v.text + "</option>";
+                    });
+                    $("#ServiceConnection").html(row);
+                })
+            })
+
+        })
+
+        $("#ProjectName").change(function () {
+            $.getJSON("/DevOps/ServiceEndPoints", { organization: $("#OrganizationName").val(), project: $("#ProjectName option:selected").text() }, function (d) {
+                var row = "";
+                $("#ServiceConnection").empty();
+                $.each(d, function (i, v) {
+                    row += "<option value=" + v.value + ">" + v.text + "</option>";
+                });
+                $("#ServiceConnection").html(row);
+            })
+        })
+    })
+
+    $(function () {
+        $("#checkall").click(function () {
+            $("input[class='eachone']").attr("checked", this.checked)
+        });
+    });
+
+    $('[type="radio"]').first().prop("checked", true);
+
+</script>

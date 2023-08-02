@@ -1,0 +1,13 @@
+﻿<choose>
+  <when condition='@(context.Response.StatusCode == 200 && context.Product.Name.Equals('Starter='''))'>
+    <set-body>
+      @{
+      var response = context.Response.Body.As<JObject>();
+        foreach (var key in new [] {'minutely', 'hourly', 'daily', 'flags'}) {
+          response.Property (key).Remove ();
+        }
+        return response.ToString();
+      }
+    </set-body>
+  </when>
+</choose>

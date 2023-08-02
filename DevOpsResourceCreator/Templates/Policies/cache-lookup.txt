@@ -1,0 +1,3 @@
+﻿<cache-lookup vary-by-developer='false' vary-by-developer-groups='false' downstream-caching-type='none' must-revalidate='true' caching-type='internal' >
+    <vary-by-query-parameter>version</vary-by-query-parameter>
+</cache-lookup>

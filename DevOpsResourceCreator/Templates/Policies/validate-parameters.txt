@@ -1,0 +1,8 @@
+﻿<validate-parameters specified-parameter-action='prevent' unspecified-parameter-action='prevent' errors-variable-name='requestParametersValidation'>
+  <headers specified-parameter-action='detect' unspecified-parameter-action='detect'>
+    <parameter name='Authorization' action='prevent' />
+    <parameter name='User-Agent' action='ignore' />
+    <parameter name='Host' action='ignore' />
+    <parameter name='Referrer' action='ignore' />
+  </headers>
+</validate-parameters>

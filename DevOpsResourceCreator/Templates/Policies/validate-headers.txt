@@ -1,0 +1,1 @@
+﻿<validate-headers specified-header-action='ignore' unspecified-header-action='prevent' errors-variable-name='responseHeadersValidation' />

@@ -1,0 +1,4 @@
+﻿<validate-content unspecified-content-type-action='prevent' max-size='102400' size-exceeded-action='prevent' errors-variable-name='requestBodyValidation'>
+  <content type='application/json' validate-as='json' action='detect' />
+  <content type='application/hal+json' validate-as='json' action='detect' />
+</validate-content>

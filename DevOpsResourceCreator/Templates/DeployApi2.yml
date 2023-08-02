@@ -1,0 +1,73 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+parameters:
+- name: Environment
+  type: string
+  default: dev
+  values:
+  - dev
+  #environments#
+variables: 
+- name: ServiceConnectionName
+  value: 'apimaas-${{ parameters.Environment }}-sc'
+- group: apim-as-a-service-${{ parameters.Environment }}-variablegroup
+  
+stages:
+  - stage: Stage_BuildAPI
+    displayName: 'Build API'
+    jobs:
+    - job: Job_BuildAPI
+      displayName: 'API - Build Job'
+      pool:
+       vmImage: ubuntu-latest
+      steps:      
+      - task: DotNetCoreCLI@2
+        displayName: 'Restore_API'
+        inputs:
+          command: 'restore'
+          projects: '**/*.csproj'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Build_API'
+        inputs:
+          command: 'build'
+          projects: '**/APIM-as-a-Service.Api.csproj'
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish_API'
+        inputs:
+          command: 'publish'
+          publishWebProjects: true
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/Release-API'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifacts'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/Release-API'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+
+  - stage: Stage_DeployAPI
+    displayName: 'Deploy API'
+    jobs:
+    - job: Job_DeployAPI
+      displayName: 'API - Deploy Job'
+      pool:
+       vmImage: ubuntu-latest
+      steps:
+       - task: DownloadBuildArtifacts@0
+         inputs:
+           buildType: 'current'
+           downloadType: 'single'
+           artifactName: 'drop'
+           downloadPath: '$(Build.ArtifactStagingDirectory)/Release-API'
+       - task: AzureRmWebAppDeployment@4
+         inputs:
+           ConnectionType: 'AzureRM'
+           azureSubscription: '$(ServiceConnectionName)'
+           appType: 'webApp'
+           WebAppName: '$(wapp-name2)'
+           packageForLinux: '$(Build.ArtifactStagingDirectory)/Release-API/drop/*.zip'

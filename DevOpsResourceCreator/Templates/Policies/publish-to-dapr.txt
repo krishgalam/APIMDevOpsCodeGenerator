@@ -1,0 +1,6 @@
+﻿   <publish-to-dapr
+       pubsub-name='orders'
+           topic='new'
+           response-variable-name='dapr-response'>
+      @(context.Request.Body.As<string>())
+        </publish-to-dapr>

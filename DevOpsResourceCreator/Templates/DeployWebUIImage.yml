@@ -1,0 +1,27 @@
+trigger:
+- master
+parameters:
+- name: Environment
+  type: string
+  default: dev
+  values:
+  - dev
+#environments#
+stages:
+  - stage: Stage_BuildWebUI
+    displayName: 'Build Web UI Image'
+    jobs:
+    - job: Job_BuildWebUIImage
+      displayName: 'Web UI- Build Image Job '
+      pool:
+       vmImage: ubuntu-latest          
+      steps:
+        - task: Docker@2
+          displayName: Build and push an image of the Web UI to container registry
+          inputs:
+            repository: 'containerapp-web-UI'
+            command: buildAndPush
+            Dockerfile: 'containerapp-web-UI/Dockerfile'
+            containerRegistry: 'containerapp-cr-dev'
+            tags: |
+              v1

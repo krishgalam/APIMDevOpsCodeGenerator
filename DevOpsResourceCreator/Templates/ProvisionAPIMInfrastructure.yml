@@ -1,0 +1,264 @@
+trigger:
+ - main
+variables:
+  - name: rgname
+    value: '#rgname#'
+  - name: storageaccountname
+    value: '#storageaccountname#'
+  - name: terraformstatecontainer
+    value: 'terraform-dev'
+  - name: ServiceConnectionName
+    value: '#ServiceConnectionName#'
+  - name: APIMName
+    value: '#APIMName#'
+  - name: apim-sku
+    value: 'Consumption_0'
+  - name: PricingTier
+    value: '#PricingTier#'
+  - name: publisher_name
+    value: '#publisher_name#'
+  - name: publisher_email
+    value: '#publisher_email#'
+  - name: wapp-name
+    value: '#wapp-name#'
+  - name: APIMDevOpsToolKitArtifactContainerName
+    value: 'armtemplates'
+  - name: BuildConfiguration
+    value: 'Release'
+  - name: location
+    value: 'eastus'  
+stages:
+ - stage: Prerequisites_Stage
+   jobs:
+   - job: GenerateSASToken
+     pool:
+      vmImage: ubuntu-latest
+     steps:
+     - task: AzureCLI@2
+       name: 'SASGenerationTask'
+       inputs:
+         azureSubscription: $(ServiceConnectionName)
+         scriptType: pscore
+         scriptLocation: 'inlineScript'
+         inlineScript: |
+          az storage account create -n $(storageaccountname) -g $(rgname) -l $(location) --sku Standard_LRS
+          az storage container create -n $(terraformstatecontainer) --account-name  $(storageaccountname)
+          az storage container create -n $(APIMDevOpsToolKitArtifactContainerName) --account-name  $(storageaccountname)
+          $end=(Get-Date).AddDays(1)
+          $sas= az storage account generate-sas --account-name $(storageaccountname) --permissions acldrw --resource-types co --services b --expiry $end.ToString('yyyy-MM-dd') --https-only -o tsv
+          Write-Host '##vso[task.setvariable variable=SASToken;isOutput=true;]$sas'
+    
+ 
+ - stage: DeployAPIMService
+   
+   jobs:
+   - job: DeployAPIM
+     pool:
+      vmImage: ubuntu-latest
+     
+     steps:
+     - checkout: self
+     - task: replacetokens@4
+       inputs:
+          rootDirectory: '$(System.DefaultWorkingDirectory)/Infra/'
+          targetFiles: '**/*.tfvars'
+          encoding: 'auto'
+          tokenPattern: 'default'
+          writeBOM: true
+          actionOnMissing: 'warn'
+          keepToken: false
+          actionOnNoFiles: 'continue'
+          enableTransforms: false
+          useLegacyPattern: false
+          enableTelemetry: true     
+     - task: TerraformInstaller@0
+       inputs:
+        terraformVersion: '1.0.0'
+     - task: TerraformTaskV2@2
+       displayName: Init Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: $(ServiceConnectionName)
+          backendAzureRmResourceGroupName: $(rgname)
+          backendAzureRmStorageAccountName: $(storageaccountname)
+          backendAzureRmContainerName: $(terraformstatecontainer)
+          backendAzureRmKey: terraform.tfstate
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+     - task: TerraformTaskV2@2
+       displayName: Validate Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'validate'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+     - task: TerraformTaskV2@2
+       displayName: Plan Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+          environmentServiceNameAzureRM: $(ServiceConnectionName)
+
+     - task: TerraformTaskV2@2
+       displayName: Apply Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+          environmentServiceNameAzureRM: $(ServiceConnectionName)
+ - stage: 'Generate_Deploy_ARM'
+   dependsOn:
+   - Prerequisites_Stage
+   - DeployAPIMService
+   jobs: 
+   - job: 'Generate_Deploy_ARM'
+     variables:
+       FinalSASToken: $[stageDependencies.Prerequisites_Stage.GenerateSASToken.outputs['SASGenerationTask.SASToken']]
+     steps:
+     
+     - checkout: self
+     - task: DotNetCoreCLI@2
+       displayName: Build
+       inputs:
+          projects: '**/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+     - task: DotNetCoreCLI@2
+       displayName: Publish
+       inputs:
+          command: publish
+          publishWebProjects: false
+          projects: '**/*.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          zipAfterPublish: true
+     - task: PowerShell@2
+       displayName: Create_Folders
+       inputs:
+         targetType: 'inline'
+         script: |
+              Write-Host 'Creating Folders..!'
+              cd $(System.DefaultWorkingDirectory)
+              mkdir armtemplates
+              Write-Host 'armtemplates folder created'
+              cd armtemplates
+              mkdir output
+              Write-Host 'Output folder created'
+     
+     - task: replacetokens@4
+       inputs:
+          rootDirectory: '$(System.DefaultWorkingDirectory)/Infra/templates/'
+          targetFiles: '**/*.*'
+          encoding: 'auto'
+          tokenPattern: 'default'
+          writeBOM: true
+          actionOnMissing: 'warn'
+          keepToken: false
+          actionOnNoFiles: 'continue'
+          enableTransforms: false
+          useLegacyPattern: false
+          enableTelemetry: true
+     - task: CopyFiles@2
+       displayName: 'Copy Files to: $(System.DefaultWorkingDirectory)'
+       inputs:
+          SourceFolder: Infra/templates
+          TargetFolder: '$(System.DefaultWorkingDirectory)'
+      
+     - task: DotNetCoreCLI@2
+       displayName: 'Generate ARM from Swagger'
+       inputs:
+          command: run
+          projects: '**/apimtemplate.csproj'
+          arguments: 'create --configFile $(System.DefaultWorkingDirectory)/WeatherForecastConfig.yml'
+     - task: PowerShell@2
+       displayName: Validation - List the Files
+
+       inputs:
+         targetType: 'inline'
+         script: |
+              Write-Host 'Generate ARM Stage - Hello World'
+              Get-ChildItem -Path '$(System.DefaultWorkingDirectory)' -recurse
+     - task: AzureCLI@2
+       displayName: Copy ARM Templates to Storage Container
+       inputs:
+          azureSubscription: $(ServiceConnectionName)
+          scriptType: pscore
+          scriptLocation: inlineScript
+          inlineScript: |
+              az storage blob upload-batch --account-name $(storageaccountname) -d armtemplates -s $(System.DefaultWorkingDirectory)/armtemplates/output/
+
+     - task: AzureResourceManagerTemplateDeployment@3
+       displayName: Deploy Operations
+       inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: $(ServiceConnectionName)
+          subscriptionId: '511235a9-1907-41f1-b32f-27948e2a86be'
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: $(rgname)
+          location:  $(location)
+          templateLocation: 'Linked artifact'
+          csmFile: '$(System.DefaultWorkingDirectory)/Infra/templates/APIMasaService.master.template.json'
+          csmParametersFile: '$(System.DefaultWorkingDirectory)/Infra/templates/APIMasaService.master.template.parameters.json'
+          deploymentMode: 'Incremental'  
+     - task: PublishBuildArtifacts@1
+       displayName: 'Publish Artifact'
+       inputs:
+          PathtoPublish: '$(System.DefaultWorkingDirectory)/armtemplates/output'
+
+ - stage: 'Build'
+   displayName: 'Build Pilot API'
+   jobs:
+   - job: 'Build'
+     displayName: 'Pilot API - Build Job'
+     pool:
+       vmImage: ubuntu-latest
+     steps:
+      - task: DotNetCoreCLI@2
+        displayName: 'Restore'
+        inputs:
+          command: 'restore'
+          projects: '**/*.csproj'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Build'
+        inputs:
+          command: 'build'
+          projects: '**/APIM-as-a-Service.Api.csproj'
+      - task: DotNetCoreCLI@2
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/*[Tt]est/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish'
+        inputs:
+          command: 'publish'
+          publishWebProjects: true
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/Pilot-API'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifacts'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/Pilot-API'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+
+ - stage: 'Deploy'
+   displayName: 'Deploy Pilot API'
+   jobs:
+   - job: 'Deploy'
+     displayName: 'Pilot API - Deploy Job'
+     pool:
+       vmImage: ubuntu-latest
+     steps:
+       - task: DownloadBuildArtifacts@0
+         inputs:
+           buildType: 'current'
+           downloadType: 'single'
+           artifactName: 'drop'
+           downloadPath: '$(Build.ArtifactStagingDirectory)/Pilot-API'
+       - task: AzureRmWebAppDeployment@4
+         inputs:
+           ConnectionType: 'AzureRM'
+           azureSubscription: '$(ServiceConnectionName)'
+           appType: 'webApp'
+           WebAppName: '$(wapp-name)'
+           packageForLinux: '$(Build.ArtifactStagingDirectory)/Pilot-API/drop/*.zip'

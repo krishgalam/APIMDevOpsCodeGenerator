@@ -1,0 +1,13 @@
+{
+  "folder": null,
+  "name": "#Name#",
+  "configuration": {
+    "type": "yaml",
+    "path": "/Pipelines/#Name#.yml",
+    "repository": {
+      "id": "#RepositoryID#",
+      "name": "#RepoName#",
+      "type": "azureReposGit"
+    }
+  }
+}

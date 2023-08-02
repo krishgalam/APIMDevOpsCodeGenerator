@@ -1,0 +1,41 @@
+trigger:
+ - main
+parameters:
+- name: Environment
+  type: string
+  default: dev
+  values:
+  - dev
+  #environments#
+variables: 
+- name: ServiceConnectionName
+  value: 'apimaas-${{ parameters.Environment }}-sc'
+- group: apim-as-a-service-${{ parameters.Environment }}-variablegroup
+
+stages:
+ - stage: Stage_Prerequisites
+   jobs:
+   - job: Job_CreateStorageAccount
+     steps:
+     - task: AzureCLI@2
+       name: 'SASGenerationTask'
+       inputs:
+         azureSubscription: $(ServiceConnectionName)
+         scriptType: pscore
+         scriptLocation: 'inlineScript'
+         inlineScript: |
+          az storage container create -n $(APIMDevOpsToolKitArtifactContainerName) --account-name  $(storageaccountname)
+          $end=(Get-Date).AddDays(1)
+          $sas= az storage account generate-sas --account-name $(storageaccountname) --permissions acldrw --resource-types co --services b --expiry $end.ToString('yyyy-MM-dd') --https-only -o tsv
+          Write-Host \"##vso[task.setvariable variable=SASToken;isOutput=true;]$sas\"
+   
+ - stage: Stage_DeployAllAPIOperations
+   dependsOn:
+   - Stage_Prerequisites
+   jobs: 
+   - job: Job_DeployAllAPIOperations
+     variables:     
+      - name: FinalSASToken
+        value: $[stageDependencies.Stage_Prerequisites.Job_CreateStorageAccount.outputs['SASGenerationTask.SASToken']] 
+     steps:
+      - template: Templates/APIOperationTemplate.yml

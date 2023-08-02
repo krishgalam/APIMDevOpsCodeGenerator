@@ -1,0 +1,5 @@
+﻿<emit-metric name='Request' value='1' namespace='my-metrics'>
+  <dimension name='User ID' />
+  <dimension name='Client IP' value='@(context.Request.IpAddress)' />
+  <dimension name='API ID' />
+</emit-metric>

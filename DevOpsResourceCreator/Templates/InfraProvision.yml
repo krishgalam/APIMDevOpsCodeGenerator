@@ -1,0 +1,26 @@
+trigger:
+ - main
+pool:
+  vmImage: ubuntu-latest
+parameters:
+- name: Environment
+  type: string
+  default: dev
+  values:
+  - dev
+  #environments#
+variables: 
+- name: ServiceConnectionName
+  value: 'apimaas-${{ parameters.Environment }}-sc'
+- group: apim-as-a-service-${{ parameters.Environment }}-variablegroup
+stages:
+ - stage: Stage_Prerequisites
+   jobs:
+   - job: Job_CreateStorageAccount     
+     steps:
+      - template: Templates/InfraPrerequisiteTemplate.yml
+ - stage: Stage_CreateAndDeployContainerApp   
+   jobs:
+   - job: Job_DeployContainerApp
+     steps:
+      - template: Templates/InfraDeployTemplate.yml

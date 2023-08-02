@@ -1,0 +1,13 @@
+﻿    <invoke-dapr-binding
+                  name='external-system'
+                  operation='create'
+                  response-variable-name='bind-response'>
+      <metadata>
+        <item key='source'>api-management</item>
+        <item key='client-ip'>@( context.Request.IpAddress )</item>
+      </metadata>
+      <data>
+        @( context.Request.Body.As<string>() )
+            </data>
+    </invoke-dapr-binding>
+   

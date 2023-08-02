@@ -1,0 +1,220 @@
+trigger:
+ - main
+variables:
+  - name: rgname
+    value: 'rg-fsapps-apimaas-dev-eus'
+  - name: storageaccountname
+    value: 'strgapimaastfstates'
+  - name: terraformstatecontainer
+    value: 'terraform-dev'
+  - name: ServiceConnectionName
+    value: 'apimaas-dev-sc'
+  - name: APIMName
+    value: 'APIMaaS-dev-eus-apim'
+  - name: apim-sku
+    value: 'Consumption_0'
+  - name: publisher_name
+    value: 'Capgemini'
+  - name: publisher_email
+    value: 'praveen-kumar.sreeram@capgemini.com'
+  - name: wapp-name1
+    value: 'APIaaS-dev-eus-webapp1'
+  - name: wapp-name2
+    value: 'APIaaS-dev-eus-webapp2'
+  - name: location
+    value: 'eastus'  
+
+stages:
+ - stage: Stage_Prerequisites
+   jobs:
+   - job: Job_CreateStorageAccount
+     pool:
+      vmImage: ubuntu-latest
+     steps:
+     - task: AzureCLI@2
+       name: 'SASGenerationTask'
+       inputs:
+         azureSubscription: $(ServiceConnectionName)
+         scriptType: pscore
+         scriptLocation: 'inlineScript'
+         inlineScript: |
+          az storage account create -n $(storageaccountname) -g $(rgname) -l $(location) --sku Standard_LRS
+          az storage container create -n $(terraformstatecontainer) --account-name  $(storageaccountname)
+ 
+ - stage: Stage_DeployAPIMService
+   
+   jobs:
+   - job: Job_DeployAPIMService
+     
+     pool:
+      vmImage: ubuntu-latest
+     
+     steps:
+     - checkout: self
+     - task: replacetokens@4
+       inputs:
+          rootDirectory: '$(System.DefaultWorkingDirectory)/Infra/'
+          targetFiles: '**/*.tfvars'
+          encoding: 'auto'
+          tokenPattern: 'default'
+          writeBOM: true
+          actionOnMissing: 'warn'
+          keepToken: false
+          actionOnNoFiles: 'continue'
+          enableTransforms: false
+          useLegacyPattern: false
+          enableTelemetry: true
+     
+     - task: TerraformInstaller@0
+       inputs:
+        terraformVersion: '1.0.0'
+     - task: TerraformTaskV2@2
+       displayName: Init Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: $(ServiceConnectionName)
+          backendAzureRmResourceGroupName: $(rgname)
+          backendAzureRmStorageAccountName: $(storageaccountname)
+          backendAzureRmContainerName: $(terraformstatecontainer)
+          backendAzureRmKey: terraform.tfstate
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+     - task: TerraformTaskV2@2
+       displayName: Validate Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'validate'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+     - task: TerraformTaskV2@2
+       displayName: Plan Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+          environmentServiceNameAzureRM: $(ServiceConnectionName)
+
+     - task: TerraformTaskV2@2
+       displayName: Apply Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+          environmentServiceNameAzureRM: $(ServiceConnectionName)
+- stage: Stage_DeployAPIMService
+   
+   jobs:
+   - job: Job_DeployAPIMService
+     
+     pool:
+      vmImage: ubuntu-latest
+     
+     steps:
+     - checkout: self
+     - task: replacetokens@4
+       inputs:
+          rootDirectory: '$(System.DefaultWorkingDirectory)/Infra/'
+          targetFiles: '**/*.tfvars'
+          encoding: 'auto'
+          tokenPattern: 'default'
+          writeBOM: true
+          actionOnMissing: 'warn'
+          keepToken: false
+          actionOnNoFiles: 'continue'
+          enableTransforms: false
+          useLegacyPattern: false
+          enableTelemetry: true
+     
+     - task: TerraformInstaller@0
+       inputs:
+        terraformVersion: '1.0.0'
+     - task: TerraformTaskV2@2
+       displayName: Init Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: $(ServiceConnectionName)
+          backendAzureRmResourceGroupName: $(rgname)
+          backendAzureRmStorageAccountName: $(storageaccountname)
+          backendAzureRmContainerName: $(terraformstatecontainer)
+          backendAzureRmKey: terraform.tfstate
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+     - task: TerraformTaskV2@2
+       displayName: Validate Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'validate'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+     - task: TerraformTaskV2@2
+       displayName: Plan Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+          environmentServiceNameAzureRM: $(ServiceConnectionName)
+
+     - task: TerraformTaskV2@2
+       displayName: Apply Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+          environmentServiceNameAzureRM: $(ServiceConnectionName)
+- stage: Stage_DeployAPIMService
+   
+   jobs:
+   - job: Job_DeployAPIMService
+     
+     pool:
+      vmImage: ubuntu-latest
+     
+     steps:
+     - checkout: self
+     - task: replacetokens@4
+       inputs:
+          rootDirectory: '$(System.DefaultWorkingDirectory)/Infra/'
+          targetFiles: '**/*.tfvars'
+          encoding: 'auto'
+          tokenPattern: 'default'
+          writeBOM: true
+          actionOnMissing: 'warn'
+          keepToken: false
+          actionOnNoFiles: 'continue'
+          enableTransforms: false
+          useLegacyPattern: false
+          enableTelemetry: true
+     
+     - task: TerraformInstaller@0
+       inputs:
+        terraformVersion: '1.0.0'
+     - task: TerraformTaskV2@2
+       displayName: Init Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: $(ServiceConnectionName)
+          backendAzureRmResourceGroupName: $(rgname)
+          backendAzureRmStorageAccountName: $(storageaccountname)
+          backendAzureRmContainerName: $(terraformstatecontainer)
+          backendAzureRmKey: terraform.tfstate
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+     - task: TerraformTaskV2@2
+       displayName: Validate Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'validate'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+     - task: TerraformTaskV2@2
+       displayName: Plan Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+          environmentServiceNameAzureRM: $(ServiceConnectionName)
+
+     - task: TerraformTaskV2@2
+       displayName: Apply Terraform
+       inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/Infra'
+          environmentServiceNameAzureRM: $(ServiceConnectionName)

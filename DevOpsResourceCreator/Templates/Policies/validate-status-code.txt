@@ -1,0 +1,1 @@
+﻿<validate-status-code unspecified-status-code-action='prevent' errors-variable-name='responseStatusCodeValidation' />

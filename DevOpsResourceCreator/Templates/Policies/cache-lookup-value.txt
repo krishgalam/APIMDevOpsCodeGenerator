@@ -1,0 +1,3 @@
+﻿<cache-lookup-value
+    key='@(\"userprofile-\" + context.Variables[\"enduserid\"])'
+    variable-name='userprofile' />

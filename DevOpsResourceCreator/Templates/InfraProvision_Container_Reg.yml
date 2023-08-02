@@ -1,0 +1,26 @@
+
+trigger:
+ - none
+pool:
+  vmImage: ubuntu-latest
+parameters:
+- name: Environment
+  type: string
+  default: dev
+  values:
+  - dev
+#environments#
+
+variables: 
+- name: ServiceConnectionName
+  value: 'containerapp-sp-${{ parameters.Environment }}'
+- group: apim-as-a-service-${{ parameters.Environment }}-variablegroup
+- name: AcrServiceConnectionName
+  value: 'containerapp-cr-${{ parameters.Environment }}'
+- group: apim-as-a-service-${{ parameters.Environment }}-variablegroup
+stages: 
+ - stage: Stage_DeployContainerRegistry
+   jobs:
+   - job: Job_DeployContainerRegistry
+     steps:
+      - template: Templates/InfraDeployTemplate_Container_Reg.yml

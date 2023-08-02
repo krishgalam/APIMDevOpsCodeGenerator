@@ -1,0 +1,108 @@
+﻿<policies>
+  <inbound>
+    <base />
+    <set-variable name="customHeader" value="" />
+    <set-variable name="customHeaderValue" value="" />
+    <set-variable name="customHeaderExistsAction" value="override" />
+    <set-variable name="rateLimitCalls" value="20" />
+    <set-variable name="rateLimitRenewalPeriod" value="90" />
+    <set-variable name="quotaCalls" value="10000" />
+    <set-variable name="quotaBandwidth" value="40000" />
+    <set-variable name="quotaRenewalPeriod" value="3600" />
+    <set-variable name="allowIPRestriction" value="false" />
+    <set-variable name="fromIPRange" value="" />
+    <set-variable name="toIPRange" value="" />
+    <set-variable name="cacheKeyValue" value="" />
+    <set-variable name="cacheKeyDuration" value="10" />
+    <set-variable name="certificateVerification" value="false" />
+    <set-variable name="certificateSubjectName" value="" />
+    <!-- Set-header policy-->
+    <set-header name="Content-Type" exists-action="append">
+      <value>application/json</value>
+    </set-header>
+    <choose>
+      <when condition="@(context.Variables[""customHeader=""] != null)">
+        <set-header name="@(context.Variables[""customHeader=""])" exists-action="@(context.Variables[""customHeaderExistsAction=""])">
+          <value>@((string)context.Variables[""customHeaderValue""])</value>
+        </set-header>
+      </when>
+    </choose>
+    <!-- Set rate limit by key policy: The rate-limit-by-key policy prevents API usage spikes on a per key basis by limiting the call rate to a specified number per a specified time period-->
+    <rate-limit-by-key calls="@(context.Variables[""rateLimitCalls=""])" renewal-period="@(context.Variables["rateLimitRenewalPeriod="""])" counter-key="@(context.Subscription.Id)" increment-condition="@(context.Response.StatusCode == 200)" />
+    <!-- Quota by key policy: The quota-by-key policy enforces a renewable or lifetime call volume and/or bandwidth quota, on a per key basis-->
+    <quota-by-key calls="@(context.Variables["quotaCalls="""])" bandwidth="@(context.Variables["quotaBandwidth="""])" renewal-period="@(context.Variables["quotaRenewalPeriod=""
+                  increment-condition="@(context.Response.StatusCode >= 200 && context.Response.StatusCo"< 400)"
+                      counter-key="@(context.Request.IpAddress)" />
+    <!-- IP Restriction Policy:The ip-filter policy filters (allows/denies) calls from specific IP addresses and/or address ranges-->
+    <!-- action=allow: To apply IP restrction policy-->
+    <ip-filter action="@(context.Variables["allowIPRestriction="""])">
+      <address-range from="@(context.Variables["fromIPRange="""])" to="@(context.Variables["toIPRange="""])" />
+    </ip-filter>
+    <!-- Cache look up policy-->
+    <cache-lookup vary-by-developer="false" vary-by-developer-groups="false" downstream-caching-type="none" must-revalidate="true" caching-type="internal" >
+      <vary-by-query-parameter>version</vary-by-query-parameter>
+    </cache-lookup>
+    <cache-store-value key="cacheKey" value="@(context.Variables["cacheKeyValue="""])" duration="@(context.Variables["cacheKeyDuration="""])"/>
+    <cache-lookup-value key="cacheKey" variable-name="cacheKeyVariable" />
+    <!-- Remove an item from cache-->
+    <choose>
+      <when condition="@(context.Variables.ContainsKey("cacheKeyVariable="""))">
+        <cache-remove-value key="cacheKey"/>
+      </when>
+    </choose>
+
+    <!-- Certification Verification policy-->
+    <choose>
+      <when condition="@(context.Variables.GetValueOrDefault"
+        <bool>
+          ("certificateVerification"))">
+          <choose>
+            <when condition="@(context.Request.Certificate == null || !context.Request.Certificate.Verify() || context.Request.Certificate.Issuer != "trusted-issuer=""" || context.Request.Certificate.SubjectName.Name != context.Variables["certificateSubjectName="""])" >
+              <return-response>
+                <set-status code="403" reason="Invalid client certificate" />
+              </return-response>
+            </when>
+          </choose>
+          <choose>
+            <when condition="@(context.Request.Certificate == null || !context.Request.Certificate.Verify()  || !context.Deployment.Certificates.Any(c => c.Value.Thumbprint == context.Request.Certificate.Thumbprint))" >
+              <return-response>
+                <set-status code="403" reason="Invalid client certificate" />
+              </return-response>
+            </when>
+          </choose>
+        </when>
+    </choose>
+  </inbound>
+  <backend>
+    <base />
+    <set-variable name="retryCount" value="5" />
+    <set-variable name="retryInterval" value="5" />
+    <retry condition="@(context.Response.StatusCode == 500)" count="@(context.Variables["retryCount="""])" interval="@(context.Variables["retryInterval="""])">
+      <forward-request buffer-request-body="true" />
+    </retry>
+  </backend>
+  <outbound>
+    <base />
+    <set-variable name="xmlToJson" value="true" />
+    <set-variable name="cacheDuration" value="seconds" />
+    <!-- XML To JSON or JSON to XML Conversion policy-->
+    <!-- kind=direct: the converted JSON reflects the original XML document's structure.-->
+    <!-- apply=content-type-xml: convert only if response Content-Type header indicates presence of XML-->
+    <!-- consider-accept-header=true: apply conversion if JSON is requested in request Accept header-->
+    <!-- parse-date=true/false: parsing is required or not (only applicable for json to xml) -->
+    <choose>
+      <when condition="@(context.Variables.GetValueOrDefault"
+        <bool>
+          ("xmlToJson"))">
+          <xml-to-json kind="direct" apply="always" consider-accept-header="false" />
+        </when>
+      <otherwise>
+        <json-to-xml apply="always" consider-accept-header="false" parse-date="false"/>
+        <otherwise>
+        </choose>
+    <cache-store duration="@(context.Variables["cacheDuration="""])" />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

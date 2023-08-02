@@ -1,0 +1,5 @@
+﻿<set-variable name='retryCount' value='5' />
+<set-variable name='retryInterval' value='5' />
+<retry condition='@(context.Response.StatusCode == 500)' count='@(context.Variables['retryCount='])' interval='@(context.Variables['retryInterval='])'>
+  <forward-request buffer-request-body='true' />
+</retry>

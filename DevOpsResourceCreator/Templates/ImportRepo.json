@@ -1,0 +1,11 @@
+{
+  "parameters": {
+    "deleteServiceEndpointAfterImportIsDone": true,
+    "gitSource": {
+      "overwrite": false,
+      "url": "#SourceCloneUrl#"
+    },
+    "tfvcSource": null,
+    "serviceEndpointId": "#serviceEndpointId#"
+  }
+}

@@ -1,0 +1,5 @@
+﻿<validate-graphql-request error-variable-name='name' max-size='102400' max-depth='4'>
+  <authorize path='/' action='allow' />
+  <authorize path='/__*' action='reject' />
+  <authorize path='/Query/list Users' action='reject' />
+</validate-graphql-request>

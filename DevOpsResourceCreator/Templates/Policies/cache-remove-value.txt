@@ -1,0 +1,1 @@
+﻿<cache-remove-value key='@(\"userprofile-\" + context.Variables[\"enduserid\"])' />

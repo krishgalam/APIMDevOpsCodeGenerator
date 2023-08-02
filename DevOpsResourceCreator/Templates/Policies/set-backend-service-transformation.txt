@@ -1,0 +1,8 @@
+﻿    <choose>
+      <when condition='@(context.Request.Url.Query.GetValueOrDefault('version') == '2013-05')'>
+        <set-backend-service base-url='http://contoso.com/api/8.2/' />
+      </when>
+      <when condition='@(context.Request.Url.Query.GetValueOrDefault('version') == '2014-03')'>
+        <set-backend-service base-url='http://contoso.com/api/9.1/' />
+      </when>
+    </choose>

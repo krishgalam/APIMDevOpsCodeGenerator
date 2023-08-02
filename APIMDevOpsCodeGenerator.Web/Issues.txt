@@ -1,0 +1,15 @@
+Issues 
+
+REfactor the variables
+Remove web-app
+
+1. Repository name should be appended
+2. Piplelines should be created for api1 and api2
+
+
+Extensions reference apis
+example create api
+https://extmgmt.dev.azure.com/cgfsdigitalassets/_apis/extensionmanagement/installedextensionsbyname/Raúl Piracés/piraces.bicep-tasks/0.3.4?api-version=6.0-preview.1
+
+get all api
+https://extmgmt.dev.azure.com/cgfsdigitalassets/_apis/extensionmanagement/installedextensions?api-version=6.0-preview.1

@@ -1,0 +1,28 @@
+﻿<wait for='all'>
+  <choose>
+    <when condition='@((bool)context.Variables[\"execute-branch-one\"])'>
+      <cache-lookup-value key='key-one' variable-name='value-one' />
+      <choose>
+        <when condition='@(!context.Variables.ContainsKey(\"value-one\"))'>
+          <send-request mode='new' response-variable-name='value-one'>
+            <set-url>https://backend-one</set-url>
+            <set-method>GET</set-method>
+          </send-request>
+        </when>
+      </choose>
+    </when>
+  </choose>
+  <choose>
+    <when condition='@((bool)context.Variables[\"execute-branch-two\"])'>
+      <cache-lookup-value key='key-two' variable-name='value-two' />
+      <choose>
+        <when condition='@(!context.Variables.ContainsKey(\"value-two\"))'>
+          <send-request mode='new' response-variable-name='value-two'>
+            <set-url>https://backend-two</set-url>
+            <set-method>GET</set-method>
+          </send-request>
+        </when>
+      </choose>
+    </when>
+  </choose>
+</wait>

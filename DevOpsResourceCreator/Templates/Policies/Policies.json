@@ -1,0 +1,120 @@
+﻿[
+  {
+    "Name": "Access restriction policies",
+    "Sort": 1,
+    "Policies": [
+      {
+        "Name": "Limit call rate by subscription",
+        "PolicyId": 2,
+        "TemplateName": "rate-limit",
+        "Sort": 2,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Restrict caller IPs",
+        "PolicyId": 4,
+        "TemplateName": "ip-filter",
+        "Sort": 4,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Certificate Verification",
+        "PolicyId": 24,
+        "TemplateName": "validate-client-certificate",
+        "Sort": 4,
+        "Type": "inbound",
+        "IsChecked": true
+      }
+    ]
+  },
+  {
+    "Name": "Advanced policies",
+    "Sort": 2,
+    "Policies": [
+      {
+        "Name": "Trace",
+        "PolicyId": 21,
+        "TemplateName": "trace",
+        "Sort": 13,
+        "Type": "inbound, outbound, backend, on-error",
+        "IsChecked": true
+      }
+    ]
+  },
+  {
+    "Name": "Caching policies",
+    "Sort": 4,
+    "Policies": [
+      {
+        "Name": "Get from cache",
+        "PolicyId": 26,
+        "TemplateName": "cache-lookup",
+        "Sort": 1,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Store to cache",
+        "PolicyId": 27,
+        "TemplateName": "cache-store",
+        "Sort": 2,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Get value from cache",
+        "PolicyId": 28,
+        "TemplateName": "cache-lookup-value",
+        "Sort": 3,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Store value in cache",
+        "PolicyId": 29,
+        "TemplateName": "cache-store-value",
+        "Sort": 4,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Remove value from cache",
+        "PolicyId": 30,
+        "TemplateName": "cache-remove-value",
+        "Sort": 5,
+        "Type": "inbound",
+        "IsChecked": true
+      }
+    ]
+  },
+  {
+    "Name": "Cross domain policies",
+    "Sort": 5,
+    "Policies": [
+      {
+        "Name": "CORS",
+        "PolicyId": 32,
+        "TemplateName": "cors",
+        "Sort": 2,
+        "Type": "inbound",
+        "IsChecked": true
+      }
+    ]
+  },
+  {
+    "Name": "Transformation policies",
+    "Sort": 6,
+    "Policies": [
+      {
+        "Name": "Convert XML to JSON ",
+        "PolicyId": 35,
+        "TemplateName": "xml-to-json",
+        "Sort": 2,
+        "Type": "inbound, outbound, on-error",
+        "IsChecked": true
+      }
+    ]
+  }
+]

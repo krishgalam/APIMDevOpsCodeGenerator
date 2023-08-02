@@ -1,0 +1,27 @@
+trigger:
+- master
+parameters:
+- name: Environment
+  type: string
+  default: dev
+  values:
+  - dev
+#environments#
+stages:
+  - stage: Stage_BuildApi
+    displayName: 'Build API Image'
+    jobs:
+    - job: Job_BuildAPIImage
+      displayName: 'API - Build Image Job '
+      pool:
+       vmImage: ubuntu-latest          
+      steps:
+        - task: Docker@2
+          displayName: Build and push an image of the API to container registry
+          inputs:
+            repository: 'APIM-as-a-Service-Api1'
+            command: buildAndPush
+            Dockerfile: 'APIM-as-a-Service.Api/Dockerfile'
+            containerRegistry: 'containerapp-cr-dev'
+            tags: |
+              v1

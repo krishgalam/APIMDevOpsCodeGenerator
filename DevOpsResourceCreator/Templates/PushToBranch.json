@@ -1,0 +1,25 @@
+{
+  "refUpdates": [
+    {
+      "name": "refs/heads/main",
+      "oldObjectId": "#OldObjectID#"
+    }
+  ],
+  "commits": [
+    {
+      "comment": "Updated yml file",
+      "changes": [
+        {
+          "changeType": "add",
+          "item": {
+            "path": "/Pipelines/#PipelineName#.yml"
+          },
+          "newContent": {
+            "content": "#Content#",
+            "contentType": "rawtext"
+          }
+        }
+      ]
+    }
+  ]
+}

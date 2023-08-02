@@ -1,0 +1,1 @@
+This folder is created to store project related documents

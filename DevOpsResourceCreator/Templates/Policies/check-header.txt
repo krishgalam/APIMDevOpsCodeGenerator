@@ -1,0 +1,7 @@
+﻿<check-header name='@(context.Variables['check-header-name'])' 
+              failed-check-httpcode='@(context.Variables['check-headerfailed-check-httpcode'])'
+              failed-check-error-message='@(context.Variables['check-header-failed-check-error-message'])'
+              ignore-case='@(context.Variables['check-header-ignore-case'])' >
+  <value>@(context.Variables['check-header-value1'])</value>
+  <value>@(context.Variables['check-header-value2'])</value>
+</check-header>

@@ -1,0 +1,27 @@
+trigger:
+- none
+parameters:
+- name: Environment
+  type: string
+  default: dev
+  values:
+  - dev
+#environments#
+stages:
+  - stage: Stage_BuildFunction
+    displayName: 'Build Function'
+    jobs:
+    - job: Job_BuildFunction
+      displayName: 'Function- Build Job'
+      pool:
+       vmImage: ubuntu-latest          
+      steps:
+        - task: Docker@2
+          displayName: Build and push image of the Function to container registry
+          inputs:
+            repository: 'queue-trigger-function'
+            command: buildAndPush
+            Dockerfile: './Dockerfile'
+            containerRegistry: 'containerapp-cr1-dev'
+            tags: |
+              v1

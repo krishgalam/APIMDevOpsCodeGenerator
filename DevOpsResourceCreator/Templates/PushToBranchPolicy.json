@@ -1,0 +1,25 @@
+{
+  "refUpdates": [
+    {
+      "name": "refs/heads/main",
+      "oldObjectId": "#OldObjectID#"
+    }
+  ],
+  "commits": [
+    {
+      "comment": "Updated Policy File",
+      "changes": [
+        {
+          "changeType": "edit",
+          "item": {
+            "path": "/Infra/templates/APIMPolicies.xml"
+          },
+          "newContent": {
+            "contentType": "rawtext",
+            "content": "#Content#"
+          }
+        }
+      ]
+    }
+  ]
+}

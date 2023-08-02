@@ -1,0 +1,4 @@
+﻿<trace source='Weather' severity='verbose'>
+    <message>@((string)context.Variables[\"clientConnectionID\"])</message>
+    <metadata name='Weather' value='WeatherApi'/>
+</trace>

@@ -1,0 +1,246 @@
+﻿[
+  {
+    "Name": "Access restriction policies",
+    "Sort": 1,
+    "Policies": [
+      {
+        "Name": "Limit call rate by subscription",
+        "PolicyId": 2,
+        "TemplateName": "rate-limit",
+        "Sort": 2,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Limit call rate by key",
+        "PolicyId": 3,
+        "TemplateName": "rate-limit-by-key",
+        "Sort": 3,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Restrict caller IPs",
+        "PolicyId": 4,
+        "TemplateName": "ip-filter",
+        "Sort": 4,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Set usage quota by subscription",
+        "PolicyId": 5,
+        "TemplateName": "quota",
+        "Sort": 5,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Set usage quota by key",
+        "PolicyId": 6,
+        "TemplateName": "quota-by-key",
+        "Sort": 6,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Validate JWT",
+        "PolicyId": 7,
+        "TemplateName": "validate-jwt",
+        "Sort": 7,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Validate client certificate",
+        "PolicyId": 8,
+        "TemplateName": "validate-client-certificate",
+        "Sort": 8,
+        "Type": "inbound",
+        "IsChecked": true
+      }
+    ]
+  },
+  {
+    "Name": "Advanced policies",
+    "Sort": 2,
+    "Policies": [
+      {
+        "Name": "Trace",
+        "PolicyId": 21,
+        "TemplateName": "trace",
+        "Sort": 13,
+        "Type": "inbound, outbound, backend, on-error",
+        "IsChecked": true
+      },
+      {
+        "Name": "Wait",
+        "PolicyId": 22,
+        "TemplateName": "wait",
+        "Sort": 14,
+        "Type": "inbound, outbound, backend",
+        "IsChecked": true
+      }
+    ]
+  },
+  {
+    "Name": "Authentication policies",
+    "Sort": 3,
+    "Policies": [
+      {
+        "Name": "Authenticate with Basic",
+        "PolicyId": 23,
+        "TemplateName": "authentication-basic",
+        "Sort": 1,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Authenticate with client certificate",
+        "PolicyId": 24,
+        "TemplateName": "authentication-certificate",
+        "Sort": 2,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Authenticate with managed identity",
+        "PolicyId": 25,
+        "TemplateName": "authentication-managed-identity",
+        "Sort": 3,
+        "Type": "inbound",
+        "IsChecked": true
+      }
+    ]
+  },
+  {
+    "Name": "Caching policies",
+    "Sort": 4,
+    "Policies": [
+      {
+        "Name": "Get from cache",
+        "PolicyId": 26,
+        "TemplateName": "cache-lookup",
+        "Sort": 1,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Store to cache",
+        "PolicyId": 27,
+        "TemplateName": "cache-store",
+        "Sort": 2,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Get value from cache",
+        "PolicyId": 28,
+        "TemplateName": "cache-lookup-value",
+        "Sort": 3,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Store value in cache",
+        "PolicyId": 29,
+        "TemplateName": "cache-store-value",
+        "Sort": 4,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "Remove value from cache",
+        "PolicyId": 30,
+        "TemplateName": "cache-remove-value",
+        "Sort": 5,
+        "Type": "inbound",
+        "IsChecked": true
+      }
+    ]
+  },
+  {
+    "Name": "Cross domain policies",
+    "Sort": 5,
+    "Policies": [
+      {
+        "Name": "Allow cross-domain calls",
+        "PolicyId": 31,
+        "TemplateName": "cross-domain",
+        "Sort": 1,
+        "Type": "inbound",
+        "IsChecked": true
+      },
+      {
+        "Name": "CORS",
+        "PolicyId": 32,
+        "TemplateName": "cors",
+        "Sort": 2,
+        "Type": "inbound",
+        "IsChecked": true
+      }
+    ]
+  },
+  {
+    "Name": "Transformation policies",
+    "Sort": 6,
+    "Policies": [
+      {
+        "Name": "Convert JSON to XML ",
+        "PolicyId": 34,
+        "TemplateName": "json-to-xml",
+        "Sort": 1,
+        "Type": "inbound, outbound, on-error",
+        "IsChecked": true
+      },
+      {
+        "Name": "Convert XML to JSON ",
+        "PolicyId": 35,
+        "TemplateName": "xml-to-json",
+        "Sort": 2,
+        "Type": "inbound, outbound, on-error",
+        "IsChecked": true
+      },
+      {
+        "Name": "Find and replace string in body ",
+        "PolicyId": 36,
+        "TemplateName": "find-and-replace",
+        "Sort": 3,
+        "Type": "inbound, outbound, backend, on-error",
+        "IsChecked": true
+      },
+      {
+        "Name": "Set backend service",
+        "PolicyId": 38,
+        "TemplateName": "set-backend-service-transformation",
+        "Sort": 5,
+        "Type": "inbound, backend",
+        "IsChecked": true
+      },
+      {
+        "Name": "Set body",
+        "PolicyId": 39,
+        "TemplateName": "set-body",
+        "Sort": 6,
+        "Type": "inbound, outbound, backend",
+        "IsChecked": true
+      },
+      {
+        "Name": "Set HTTP header",
+        "PolicyId": 40,
+        "TemplateName": "set-header",
+        "Sort": 7,
+        "Type": "inbound, outbound, backend, on-error",
+        "IsChecked": true
+      },
+      {
+        "Name": "Set query string parameter",
+        "PolicyId": 41,
+        "TemplateName": "set-query-parameter",
+        "Sort": 8,
+        "Type": "inbound, backend",
+        "IsChecked": true
+      }
+    ]
+  }
+]

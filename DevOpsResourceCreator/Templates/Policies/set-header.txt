@@ -1,0 +1,10 @@
+﻿<set-header name=\"Content-Type\" exists-action=\"append\">
+  <value>application/json</value>
+</set-header>
+<choose>
+  <when condition=\"@(context.Variables[\"customHeader\"] != null)\">
+    <set-header name=\"@(context.Variables[\"customHeader\"])\" exists-action=\"@(context.Variables[\"customHeaderExistsAction\"])\">
+      <value>@((string)context.Variables[\"customHeaderValue\"])</value>
+    </set-header>
+  </when>
+</choose>

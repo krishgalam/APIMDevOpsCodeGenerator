@@ -1,0 +1,1 @@
+﻿<set-backend-service backend-id='dapr' dapr-app-id='app-id' dapr-method='method-name' dapr-namespace='ns-name' />

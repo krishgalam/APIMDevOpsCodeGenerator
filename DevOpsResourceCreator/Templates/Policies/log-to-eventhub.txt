@@ -1,0 +1,3 @@
+﻿<log-to-eventhub logger-id='id of the logger entity' partition-id='index of the partition where messages are sent' partition-key='value used for partition assignment'>
+  Expression returning a string to be logged
+</log-to-eventhub>
